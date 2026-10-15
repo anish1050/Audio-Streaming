@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import android.util.Base64
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.security.SecureRandom
 
 // Keystore-backed storage for the app JWT, the last known entitlement and the
@@ -22,7 +24,15 @@ class AuthStore(context: Context) {
 
     var accessToken: String?
         get() = prefs.getString(KEY_TOKEN, null)
-        set(value) = prefs.edit().putString(KEY_TOKEN, value).apply()
+        set(value) {
+            prefs.edit().putString(KEY_TOKEN, value).apply()
+            _isSignedIn.value = value != null
+        }
+
+    private val _isSignedIn by lazy { MutableStateFlow(accessToken != null) }
+
+    /** Flips to false when the server rejects the token, so the app returns to sign-in. */
+    val isSignedIn: StateFlow<Boolean> get() = _isSignedIn
 
     var userId: String?
         get() = prefs.getString(KEY_USER, null)
@@ -41,10 +51,11 @@ class AuthStore(context: Context) {
                 prefs.edit().putString(KEY_DOWNLOAD, Base64.encodeToString(key, Base64.NO_WRAP)).commit()
             }
 
-    val isSignedIn: Boolean get() = accessToken != null
-
     /** Signing out keeps the download key so a re-login can still play existing downloads. */
-    fun clear() = prefs.edit().remove(KEY_TOKEN).remove(KEY_USER).remove(KEY_ENTITLEMENT).apply()
+    fun clear() {
+        prefs.edit().remove(KEY_TOKEN).remove(KEY_USER).remove(KEY_ENTITLEMENT).apply()
+        _isSignedIn.value = false
+    }
 
     private companion object {
         const val KEY_TOKEN = "access_token"
