@@ -4,10 +4,12 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DonutLarge
 import androidx.compose.material.icons.filled.GraphicEq
@@ -49,6 +51,8 @@ import com.anish1050.hires.ui.recognize.RecognizeScreen
 import com.anish1050.hires.ui.search.SearchScreen
 import com.anish1050.hires.ui.settings.SettingsScreen
 import com.anish1050.hires.ui.stats.StatsScreen
+import com.anish1050.hires.ui.theme.Card
+import com.anish1050.hires.ui.theme.Graphite
 import com.anish1050.hires.ui.theme.Ink
 
 object Routes {
@@ -146,14 +150,10 @@ private fun AppNavHost(nav: NavHostController, activity: ComponentActivity) {
 
 @Composable
 private fun TabBar(currentRoute: String?, onSelect: (String) -> Unit) {
-    androidx.compose.foundation.layout.Row(
-        Modifier.padding(top = 8.dp)
-            .background(com.anish1050.hires.ui.theme.Card, androidx.compose.foundation.shape.RoundedCornerShape(30.dp))
-            .padding(5.dp),
-    ) {
+    Row(Modifier.padding(top = 8.dp).background(Card, RoundedCornerShape(30.dp)).padding(5.dp)) {
         tabs.forEach { (route, icon) ->
             val isSelected = route == currentRoute
-            CircleButton(icon, route, onClick = { onSelect(route) }, background = if (isSelected) com.anish1050.hires.ui.theme.Graphite else com.anish1050.hires.ui.theme.Card)
+            CircleButton(icon, route, onClick = { onSelect(route) }, background = if (isSelected) Graphite else Card)
         }
     }
 }

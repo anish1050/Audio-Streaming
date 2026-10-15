@@ -1,11 +1,15 @@
 package com.anish1050.hires.data.api
 
+import java.io.IOException
+import java.net.URLEncoder
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -16,9 +20,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
-import java.net.URLEncoder
-import java.util.concurrent.TimeUnit
 
 class ApiException(val status: Int, message: String) : IOException(message)
 
@@ -42,8 +43,8 @@ class HiResApi(private val baseUrl: String, private val auth: AuthStore) {
 
     suspend fun saveTaste(genres: List<String>, artistIds: List<String>) {
         val body = buildJsonObject {
-            putJsonArray("genres") { genres.forEach { add(kotlinx.serialization.json.JsonPrimitive(it)) } }
-            putJsonArray("artist_ids") { artistIds.forEach { add(kotlinx.serialization.json.JsonPrimitive(it)) } }
+            putJsonArray("genres") { genres.forEach { add(JsonPrimitive(it)) } }
+            putJsonArray("artist_ids") { artistIds.forEach { add(JsonPrimitive(it)) } }
         }
         sendRaw("PATCH", "/api/me/taste", jsonBody(body))
     }

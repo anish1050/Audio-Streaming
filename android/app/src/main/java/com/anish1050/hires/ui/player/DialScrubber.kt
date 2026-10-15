@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.anish1050.hires.ui.theme.CardBorder
@@ -42,7 +43,7 @@ fun DialScrubber(progress: Float, onSeek: (Float) -> Unit, modifier: Modifier = 
     ) {
         val center = Offset(size.width / 2, size.height + size.width * 0.35f)
         val radius = size.width * 0.75f
-        drawCircle(CardBorder, radius, center, style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()))
+        drawCircle(CardBorder, radius, center, style = Stroke(1.dp.toPx()))
         // Ticks rotate left as the track plays; the one under the needle is "now".
         repeat(TICKS) { i ->
             val angle = Math.toRadians((-90.0 - SWEEP_DEGREES / 2 + SWEEP_DEGREES * (i.toFloat() / TICKS) - (shown - 0.5) * SWEEP_DEGREES))

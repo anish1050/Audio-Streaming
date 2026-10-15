@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -188,7 +189,7 @@ private fun Sparkline(points: List<Int>) {
         bright.zipWithNext().forEach { (a, b) ->
             val left = step * a + step / 2
             val right = step * b + step / 2
-            drawArc(Color(0xFFF4D6CC), 180f, 180f, false, topLeft = Offset(left, baseline - (right - left) / 2), size = androidx.compose.ui.geometry.Size(right - left, right - left), style = Stroke(1.2.dp.toPx()))
+            drawArc(Color(0xFFF4D6CC), 180f, 180f, false, topLeft = Offset(left, baseline - (right - left) / 2), size = Size(right - left, right - left), style = Stroke(1.2.dp.toPx()))
         }
         repeat(16) { i ->
             val isBright = i in bright

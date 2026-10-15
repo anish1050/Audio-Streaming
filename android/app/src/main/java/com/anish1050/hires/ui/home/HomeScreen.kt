@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anish1050.hires.container
+import com.anish1050.hires.data.api.DailyMix
 import com.anish1050.hires.data.api.Home
 import com.anish1050.hires.data.api.Track
 import com.anish1050.hires.ui.CircleButton
@@ -77,44 +78,13 @@ fun HomeScreen(onSearch: () -> Unit, onLibrary: () -> Unit, onSettings: () -> Un
 @Composable
 private fun HomeContent(home: Home, onSearch: () -> Unit, onLibrary: () -> Unit, onSettings: () -> Unit) {
     val player = LocalContext.current.container.player
-    val nowPlaying by player.nowPlaying.collectAsStateWithLifecycle()
     var selectedMix by rememberSaveable { mutableIntStateOf(0) }
     val mix = home.dailyMixes.getOrNull(selectedMix)
     // Without listening history or taste there are no mixes yet; Featured stands in.
     val heroTracks = mix?.tracks?.takeIf { it.isNotEmpty() } ?: home.featured
 
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 160.dp)) {
-        item {
-            Box(Modifier.fillMaxWidth().height(620.dp)) {
-                heroTracks.firstOrNull()?.let { HeroBackdrop(it) }
-                Column(Modifier.fillMaxSize().padding(horizontal = ScreenPadding)) {
-                    SectionHeader("Featured", "Sounds") {
-                        CircleButton(Icons.Default.LibraryMusic, "Library", onLibrary)
-                        CircleButton(Icons.Default.Person, "Settings", onSettings)
-                    }
-                    Spacer(Modifier.height(90.dp))
-                    MixTitle(kicker = mix?.title?.uppercase() ?: "FEATURED", line1 = (mix?.subtitle ?: "Hi-Res").uppercase(), line2 = if (mix != null) "MIX" else "PICKS")
-                    CoverCarousel(heroTracks, onPlay = { index -> player.play(heroTracks, index) })
-                    val progress = if (nowPlaying.durationMs > 0) nowPlaying.positionMs.toFloat() / nowPlaying.durationMs else 0f
-                    DialScrubber(progress, onSeek = { player.seekTo((it * nowPlaying.durationMs).toLong()) })
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        IconButton(onClick = player::previous) { Icon(Icons.Default.SkipPrevious, "Previous", tint = TextPrimary) }
-                        Spacer(Modifier.width(60.dp))
-                        IconButton(onClick = player::next) { Icon(Icons.Default.SkipNext, "Next", tint = TextPrimary) }
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        CircleButton(Icons.Default.Search, "Search", onSearch)
-                        CircleButton(
-                            if (nowPlaying.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                            if (nowPlaying.isPlaying) "Pause" else "Play mix",
-                            onClick = { if (nowPlaying.track == null) player.play(heroTracks) else player.togglePlay() },
-                        )
-                        CircleButton(Icons.Default.LibraryMusic, "Library", onLibrary)
-                    }
-                }
-            }
-        }
+        item { Hero(mix, heroTracks, onSearch, onLibrary, onSettings) }
         if (home.dailyMixes.size > 1) {
             item { SectionTitle("Your Daily Mixes") }
             item {
@@ -139,6 +109,42 @@ private fun HomeContent(home: Home, onSearch: () -> Unit, onLibrary: () -> Unit,
         if (home.featured.isNotEmpty()) {
             item { SectionTitle("Featured") }
             items(home.featured, key = { "featured-${it.id}" }) { track -> TrackRowPadded(track) { player.play(home.featured, home.featured.indexOf(track)) } }
+        }
+    }
+}
+
+/** The full-screen "Featured Sounds" block from the mockup: backdrop, mix title, covers, dial and controls. */
+@Composable
+private fun Hero(mix: DailyMix?, heroTracks: List<Track>, onSearch: () -> Unit, onLibrary: () -> Unit, onSettings: () -> Unit) {
+    val player = LocalContext.current.container.player
+    val nowPlaying by player.nowPlaying.collectAsStateWithLifecycle()
+    Box(Modifier.fillMaxWidth().height(620.dp)) {
+        heroTracks.firstOrNull()?.let { HeroBackdrop(it) }
+        Column(Modifier.fillMaxSize().padding(horizontal = ScreenPadding)) {
+            SectionHeader("Featured", "Sounds") {
+                CircleButton(Icons.Default.LibraryMusic, "Library", onLibrary)
+                CircleButton(Icons.Default.Person, "Settings", onSettings)
+            }
+            Spacer(Modifier.height(90.dp))
+            MixTitle(kicker = mix?.title?.uppercase() ?: "FEATURED", line1 = (mix?.subtitle ?: "Hi-Res").uppercase(), line2 = if (mix != null) "MIX" else "PICKS")
+            CoverCarousel(heroTracks, onPlay = { index -> player.play(heroTracks, index) })
+            val progress = if (nowPlaying.durationMs > 0) nowPlaying.positionMs.toFloat() / nowPlaying.durationMs else 0f
+            DialScrubber(progress, onSeek = { player.seekTo((it * nowPlaying.durationMs).toLong()) })
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                IconButton(onClick = player::previous) { Icon(Icons.Default.SkipPrevious, "Previous", tint = TextPrimary) }
+                Spacer(Modifier.width(60.dp))
+                IconButton(onClick = player::next) { Icon(Icons.Default.SkipNext, "Next", tint = TextPrimary) }
+            }
+            Spacer(Modifier.weight(1f))
+            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                CircleButton(Icons.Default.Search, "Search", onSearch)
+                CircleButton(
+                    if (nowPlaying.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    if (nowPlaying.isPlaying) "Pause" else "Play mix",
+                    onClick = { if (nowPlaying.track == null) player.play(heroTracks) else player.togglePlay() },
+                )
+                CircleButton(Icons.Default.LibraryMusic, "Library", onLibrary)
+            }
         }
     }
 }

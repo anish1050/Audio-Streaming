@@ -1,5 +1,6 @@
 package com.anish1050.hires.ui.library
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,13 +29,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.foundation.clickable
 import com.anish1050.hires.container
 import com.anish1050.hires.data.api.AlbumRef
 import com.anish1050.hires.data.api.ArtistRef
@@ -130,7 +131,7 @@ private fun LibrarySection(title: String) {
 }
 
 @Composable
-private fun CoverTile(title: String, imagePath: String, shape: androidx.compose.ui.graphics.Shape, onClick: () -> Unit) {
+private fun CoverTile(title: String, imagePath: String, shape: Shape, onClick: () -> Unit) {
     Column(Modifier.width(112.dp).clickable(onClick = onClick)) {
         RemoteImage(imagePath, title, Modifier.size(112.dp).clip(shape))
         Text(title, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))

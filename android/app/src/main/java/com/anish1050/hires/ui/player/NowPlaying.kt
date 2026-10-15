@@ -39,6 +39,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -139,7 +141,7 @@ fun NowPlayingSheet(onUpgrade: () -> Unit) {
 }
 
 @Composable
-private fun SheetAction(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: androidx.compose.ui.graphics.Color = TextPrimary, onClick: () -> Unit) {
+private fun SheetAction(icon: ImageVector, label: String, tint: Color = TextPrimary, onClick: () -> Unit) {
     Column(Modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(icon, label, tint = tint)
         Text(label, color = TextMuted, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
