@@ -1,0 +1,5 @@
+laion_clap==1.1.6
+torch
+librosa
+numpy
+pymongo
