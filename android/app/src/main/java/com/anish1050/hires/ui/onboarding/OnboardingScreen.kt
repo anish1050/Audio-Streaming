@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.NoCredentialException
 import com.anish1050.hires.AppContainer
 import com.anish1050.hires.BuildConfig
 import com.anish1050.hires.container
@@ -85,7 +87,7 @@ private fun SignIn(activity: ComponentActivity, container: AppContainer) {
                 isWorking = true
                 error = null
                 scope.launch {
-                    error = runCatching { signInWithGoogle(activity, container) }.exceptionOrNull()?.let { "Sign-in didn't finish. Try again." }
+                    error = runCatching { signInWithGoogle(activity, container) }.exceptionOrNull()?.let(::signInErrorMessage)
                     isWorking = false
                 }
             },
@@ -97,6 +99,12 @@ private fun SignIn(activity: ComponentActivity, container: AppContainer) {
         }
         error?.let { Text(it, color = TextMuted, modifier = Modifier.padding(top = 12.dp)) }
     }
+}
+
+private fun signInErrorMessage(error: Throwable): String? = when (error) {
+    is GetCredentialCancellationException -> null
+    is NoCredentialException -> "No Google account on this phone. Add one in Android Settings, then try again."
+    else -> "Sign-in didn't finish. Try again."
 }
 
 private suspend fun signInWithGoogle(activity: ComponentActivity, container: AppContainer) {

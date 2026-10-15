@@ -56,7 +56,7 @@ class PlaybackService : MediaSessionService() {
     override fun onDestroy() {
         tracker.flush(SystemClock.elapsedRealtime())?.let(::recordListen)
         getSystemService(AudioManager::class.java).unregisterAudioDeviceCallback(deviceCallback)
-        usbMixer?.clear()
+        if (Build.VERSION.SDK_INT >= 34) usbMixer?.clear()
         session?.run {
             player.release()
             release()
@@ -77,7 +77,7 @@ class PlaybackService : MediaSessionService() {
 
     private val usbRateMatcher = object : AnalyticsListener {
         override fun onAudioInputFormatChanged(eventTime: AnalyticsListener.EventTime, format: Format, decoderReuseEvaluation: DecoderReuseEvaluation?) {
-            if (container.prefs.settings.value.isUsbRateMatching) usbMixer?.matchTrack(format.sampleRate)
+            if (Build.VERSION.SDK_INT >= 34 && container.prefs.settings.value.isUsbRateMatching) usbMixer?.matchTrack(format.sampleRate)
         }
     }
 

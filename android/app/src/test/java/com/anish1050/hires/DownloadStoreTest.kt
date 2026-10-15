@@ -13,10 +13,13 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.io.File
 
 @UnstableApi
 @RunWith(RobolectricTestRunner::class)
+// Robolectric 4.14 simulates up to API 35; the cache code under test is version-independent.
+@Config(sdk = [35])
 class DownloadStoreTest {
     private val plain = ByteArray(64 * 1024) { (it % 251).toByte() }
 

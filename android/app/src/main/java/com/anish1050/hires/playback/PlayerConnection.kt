@@ -3,10 +3,12 @@ package com.anish1050.hires.playback
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.core.os.bundleOf
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.anish1050.hires.data.api.HiResApi
@@ -55,6 +57,7 @@ class PlayerConnection(private val context: Context, private val api: HiResApi, 
 
     private fun withPlayer(action: (MediaController) -> Unit) = scope.launch { action(controller.await()) }
 
+    @OptIn(UnstableApi::class)
     private suspend fun mediaItem(track: Track, isDownloaded: Boolean): MediaItem {
         val uri: Uri
         var cacheKey: String? = null

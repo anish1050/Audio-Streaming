@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,14 +11,15 @@ plugins {
 
 android {
     namespace = "com.anish1050.hires"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         // Permanent on Play, so brand-neutral.
         applicationId = "com.anish1050.hires"
         // API 27: the platform FLAC decoder is guaranteed from here.
         minSdk = 27
-        targetSdk = 35
+        // Play requires API 36 for new apps and updates from 31 August 2026.
+        targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -25,8 +28,25 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"replace-with-web-client-id.apps.googleusercontent.com\"")
     }
 
+    // Upload key lives outside git: path and passwords come from local.properties or CI secrets.
+    val releaseSigning = Properties().apply {
+        rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+    }
+    val storeFilePath = System.getenv("UPLOAD_KEYSTORE") ?: releaseSigning.getProperty("upload.storeFile")
+    signingConfigs {
+        if (storeFilePath != null) {
+            create("upload") {
+                storeFile = file(storeFilePath)
+                storePassword = System.getenv("UPLOAD_STORE_PASSWORD") ?: releaseSigning.getProperty("upload.storePassword")
+                keyAlias = System.getenv("UPLOAD_KEY_ALIAS") ?: releaseSigning.getProperty("upload.keyAlias", "upload")
+                keyPassword = System.getenv("UPLOAD_KEY_PASSWORD") ?: releaseSigning.getProperty("upload.keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfigs.findByName("upload")?.let { signingConfig = it }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
