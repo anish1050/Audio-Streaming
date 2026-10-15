@@ -7,13 +7,22 @@ import { proxyMiddleware, type AuthVariables } from '#middleware/proxy.js'
 import { rateLimit } from '#middleware/rate-limit.js'
 import { audioRoutes } from '#routes/audio.js'
 import { authRoutes } from '#routes/auth.js'
+import { billingRoutes } from '#routes/billing.js'
 import { catalogRoutes } from '#routes/catalog.js'
+import { creditRoutes } from '#routes/credits.js'
+import { homeRoutes } from '#routes/home.js'
 import { imageRoutes } from '#routes/images.js'
+import { jobRoutes } from '#routes/jobs.js'
+import { libraryRoutes } from '#routes/library.js'
 import { meRoutes } from '#routes/me.js'
+import { playRoutes } from '#routes/plays.js'
+import { recognizeRoutes } from '#routes/recognize.js'
+import { statsRoutes } from '#routes/stats.js'
 
 // Everything under /api needs a signed-in user except these prefixes.
 const PUBLIC_PREFIXES = ['/api/health', '/api/auth/', '/api/images/', '/api/billing/google/rtdn', '/api/jobs/', '/api/credits']
 const isPublicPath = (path: string) => PUBLIC_PREFIXES.some((prefix) => path.startsWith(prefix))
+const apiRateLimit = rateLimit(120, 60, 'api')
 
 const app = new Hono<{ Variables: AuthVariables }>()
 
@@ -28,13 +37,22 @@ app.use('*', proxyMiddleware)
 app.use('/api/*', (c, next) => (isPublicPath(c.req.path) ? next() : authMiddleware(c, next)))
 
 app.use('/api/auth/*', rateLimit(10, 60, 'auth'))
-app.use('/api/*', (c, next) => (isPublicPath(c.req.path) ? next() : rateLimit(120, 60, 'api')(c, next)))
+app.use('/api/plays', rateLimit(60, 60, 'plays'))
+app.use('/api/*', (c, next) => (isPublicPath(c.req.path) ? next() : apiRateLimit(c, next)))
 
 app.get('/api/health', (c) => c.json({ success: true, data: { ok: true } }))
 
 app.route('/api/auth', authRoutes)
 app.route('/api/images', imageRoutes)
 app.route('/api/me', meRoutes)
+app.route('/api/library', libraryRoutes)
+app.route('/api/plays', playRoutes)
+app.route('/api/stats', statsRoutes)
+app.route('/api/recognize', recognizeRoutes)
+app.route('/api/billing', billingRoutes)
+app.route('/api/jobs', jobRoutes)
+app.route('/api/credits', creditRoutes)
+app.route('/api', homeRoutes)
 app.route('/api', catalogRoutes)
 app.route('/api', audioRoutes)
 
