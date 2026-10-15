@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The only place the brand name appears in the app. -->
+    <string name="app_name">Hi-Res</string>
+    <string name="downloads_channel">Downloads</string>
+    <string name="mic_rationale">We listen for 8 seconds only when you tap, and never keep the recording.</string>
+</resources>
