@@ -51,7 +51,6 @@ export interface AlbumDoc {
   artist_id: string
   title: string
   year: number
-  cover_key: string
   upc: string
   genres: string[]
   created_at: Date
@@ -62,7 +61,6 @@ export interface ArtistDoc {
   name: string
   slug: string
   bio: string
-  image_key: string
   rights_holder_id: string
   created_at: Date
 }
@@ -72,7 +70,6 @@ export interface PlaylistDoc {
   kind: 'editorial'
   title: string
   subtitle: string
-  cover_key: string
   track_ids: string[]
   updated_at: Date
 }

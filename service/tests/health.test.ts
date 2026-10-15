@@ -8,9 +8,9 @@ describe('health', () => {
     expect(await json(res)).toEqual({ success: true, data: { ok: true } })
   })
 
-  it('returns 404 envelope for unknown routes', async () => {
+  it('requires sign-in for private routes', async () => {
     const res = await api('/api/nope')
-    expect(res.status).toBe(404)
+    expect(res.status).toBe(401)
     expect((await json(res)).success).toBe(false)
   })
 })
